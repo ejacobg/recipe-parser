@@ -2,6 +2,8 @@ Scrapes recipes from budgetbyes.com and returns them as HTML or JSON. Includes o
 
 ## Notes
 
+Navigating to the "Print Recipe" link will bring you to a "minified" version of the recipe. This link contains the ID of the recipe, which might also be useful.
+
 Todo (unordered):
 
 -   [ ] Make gallery of all the recipe pics
@@ -12,6 +14,7 @@ Todo (unordered):
 -   [ ] Create local/plaintext DB
 -   [ ] Create queries/data visualizations (eg. show recipe vs ingredients)
     -   [ ] Add this to website
+-   [ ] Handle instructions that may have a nested list (find an example)
 
 ## Usage
 
