@@ -2,6 +2,16 @@ Scrapes recipes from budgetbyes.com and returns them as HTML or JSON. Includes o
 
 ## Notes
 
+Todo (unordered):
+
+- [ ] Make gallery of all the recipe pics
+- [ ] Gather all relevant info into data structure
+- [ ] Create API routes
+- [ ] Create webpage
+- [ ] Create DB of saved recipes
+- [ ] Create queries/data visualizations (eg. show recipe vs ingredients)
+    - [ ] Add this to website
+
 ## Usage
 
 ## Acknowledgements
