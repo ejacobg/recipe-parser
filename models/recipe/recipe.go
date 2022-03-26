@@ -40,40 +40,19 @@ func FromHTML(doc *html.Node) (*Recipe, error) {
 	}, nil
 }
 
-// See https://pkg.go.dev/golang.org/x/net/html#example-Parse
-func findIngredientList(node *html.Node) (*html.Node, error) {
-	if node.Type == html.ElementNode && node.Data == "ul" {
-		for _, a := range node.Attr {
-			if a.Key == "class" && a.Val == "wprm-recipe-ingredients" {
-				return node, nil
-			}
-		}
-	}
-	for c := node.FirstChild; c != nil; c = c.NextSibling {
-		list, _ := findIngredientList(c)
-		if list != nil {
-			return list, nil
-		}
-	}
-	return nil, errors.New("ingredient list does not exist")
-}
 
-func findInstructionsList(node *html.Node) (*html.Node, error) {
+func getName(doc *html.Node) string {
 
 }
 
-func getName(node *html.Node) string {
+func getImage(doc *html.Node) string {
 
 }
 
-func getImage(node *html.Node) string {
+func getIngredients(list *html.Node) []Ingredient {
 
 }
 
-func getIngredients(node *html.Node) []Ingredient {
-
-}
-
-func getInstructions(node *html.Node) []string {
+func getInstructions(list *html.Node) []string {
 
 }

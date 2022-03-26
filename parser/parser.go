@@ -1,3 +1,4 @@
+// Package parser contains all DOM traversal functions used by other packages.
 package parser
 
 import (
@@ -38,4 +39,39 @@ func PrintIngredientList(list *html.Node) {
 			}
 		}
 	}
+}
+
+// Technically don't need to return an error because we can just check for nil
+func FindRecipeCard(node *html.Node) *html.Node {
+	if node.Type == html.ElementNode && node.Data == "div" {
+		for _, a := range node.Attr {
+			if a.Key == "class" && a.Val == "wprm-recipe-container" {
+				return node
+			}
+		}
+	}
+	for c := node.FirstChild; c != nil; c = c.NextSibling {
+		card := FindRecipeCard(c)
+		if card != nil {
+			return card
+		}
+	}
+	return nil
+}
+
+func FindInstructionsList(node *html.Node) (*html.Node, error) {
+	if node.Type == html.ElementNode && node.Data == "ul" {
+		for _, a := range node.Attr {
+			if a.Key == "class" && a.Val == "wprm-recipe-instructions" {
+				return node, nil
+			}
+		}
+	}
+	for c := node.FirstChild; c != nil; c = c.NextSibling {
+		list, _ := FindInstructionsList(c)
+		if list != nil {
+			return list, nil
+		}
+	}
+	return nil, errors.New("instructions list does not exist")
 }
