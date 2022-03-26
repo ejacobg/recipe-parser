@@ -15,11 +15,12 @@ Todo (unordered):
 -   [ ] Create queries/data visualizations (eg. show recipe vs ingredients)
     -   [ ] Add this to website
 -   [ ] Handle instructions that may have a nested list (find an example)
+-   [ ] Create and initialize recipe model
 
 ## Usage
 
 When testing, remember to run the server (`cd server` then `go run .`).  
-Only 1 recipe is active right now for the parser to use (`cd parser` then `go run . slow-cooker-mashed-potatoes`).
+Only 1 recipe is active right now for the parser to use (`go run . slow-cooker-mashed-potatoes` in root).
 
 ## Acknowledgements
 
