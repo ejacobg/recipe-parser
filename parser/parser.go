@@ -75,3 +75,20 @@ func FindInstructionsList(node *html.Node) (*html.Node, error) {
 	}
 	return nil, errors.New("instructions list does not exist")
 }
+
+// Returns the first element underneath and including `node` that has the given class value (as given in the HTML)
+func GetElementWithClass(node *html.Node, tagname, class string) *html.Node {
+	if node.Type == html.ElementNode && node.Data == tagname {
+		for _, a := range node.Attr {
+			if a.Key == "class" && a.Val == class {
+				return node
+			}
+		}
+	}
+	for c := node.FirstChild; c != nil; c = c.NextSibling {
+		if GetElementWithClass(c, tagname, class) != nil {
+			return c
+		}
+	}
+	return nil
+}
