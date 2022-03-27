@@ -16,6 +16,8 @@ Todo (unordered):
     -   [ ] Add this to website
 -   [ ] Handle instructions that may have a nested list (find an example)
 -   [ ] Create and initialize recipe model
+    -   [ ] Test initialization of the recipe model
+-   [ ] Create a "GetElement" or "GetElementByKeyValue" function
 
 ## Usage
 
