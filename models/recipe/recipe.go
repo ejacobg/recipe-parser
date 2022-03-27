@@ -1,6 +1,7 @@
 package recipe
 
 import (
+	"encoding/json"
 	"parser"
 
 	"golang.org/x/net/html"
@@ -14,10 +15,19 @@ type Ingredient struct {
 }
 
 type Recipe struct {
+	ID           string       `json:"id"`
 	Name         string       `json:"name"`
 	Image        string       `json:"image"`
 	Ingredients  []Ingredient `json:"ingredients"`
 	Instructions []string     `json:"instructions"`
+}
+
+func (r *Recipe) ToJSON() (string, error) {
+	data, err := json.MarshalIndent(r, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
 }
 
 // Just return nil if it can't find the item?
@@ -34,11 +44,26 @@ func FromHTML(node *html.Node) (*Recipe, error) {
 	}
 
 	return &Recipe{
+		getID(node),
 		getName(node),
 		getImage(node),
 		getIngredients(ingredientList),
 		getInstructions(instructionsList),
 	}, nil
+}
+
+//
+func getID(node *html.Node) string {
+	rc := parser.FindRecipeCard(node)
+	if rc == nil {
+		// panic or return empty string
+	}
+	for _, a := range rc.Attr {
+		if a.Key == "data-recipe-id" {
+			return a.Val
+		}
+	}
+	return ""
 }
 
 // Probably replace nil checks with panics because they shouldn't realistically happen

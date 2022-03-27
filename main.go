@@ -49,6 +49,11 @@ func main() {
 	if err != nil {
 		log.Fatalln("Error:", err)
 	}
-	fmt.Println(r)
+
+	json, err := r.ToJSON()
+	if err != nil {
+		log.Fatalln("Error:", err)
+	}
+	fmt.Println(json)
 
 }
