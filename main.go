@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"parser"
+	"recipe"
 
 	"golang.org/x/net/html"
 )
@@ -43,4 +44,11 @@ func main() {
 	for _, a := range rc.Attr {
 		fmt.Println(a.Key, a.Val)
 	}
+
+	r, err := recipe.FromHTML(rc)
+	if err != nil {
+		log.Fatalln("Error:", err)
+	}
+	fmt.Println(r)
+
 }
