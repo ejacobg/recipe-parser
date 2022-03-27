@@ -2,7 +2,7 @@ Scrapes recipes from budgetbyes.com and returns them as HTML or JSON. Includes o
 
 ## Notes
 
-Navigating to the "Print Recipe" link will bring you to a "minified" version of the recipe. This link contains the ID of the recipe, which might also be useful.
+Navigating to the "Print Recipe" link will bring you to a "minified" version of the recipe. This link contains the ID of the recipe, which might also be useful. The recipe ID is also found within the container div.
 
 Todo (unordered):
 
