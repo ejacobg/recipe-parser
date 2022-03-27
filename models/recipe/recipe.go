@@ -55,7 +55,8 @@ func getName(node *html.Node) string {
 }
 
 func getImage(node *html.Node) string {
-	imgNode := parser.GetElementWithClass(node, "img", "attachment-200x200 size-200x200 lazy-loaded")
+	// The class list in the Elements tab has a different order than what is actually written in the raw HTML
+	imgNode := parser.GetElementWithClass(node, "img", "lazy-hidden attachment-200x200 size-200x200")
 	if imgNode == nil {
 		return "Error: imgNode not found"
 	}
@@ -108,7 +109,9 @@ func getInstructions(list *html.Node) []string {
 		if li.Type == html.ElementNode && li.Data == "li" {
 			for _, a := range li.Attr {
 				if a.Key == "class" && a.Val == "wprm-recipe-instruction" {
-					textNode := li.FirstChild
+					// Cheating here
+					// Create a "GetElement" or "GetElementByKeyValue" function
+					textNode := li.FirstChild.FirstChild.FirstChild
 					if textNode == nil {
 						// panic
 					}

@@ -86,9 +86,29 @@ func GetElementWithClass(node *html.Node, tagname, class string) *html.Node {
 		}
 	}
 	for c := node.FirstChild; c != nil; c = c.NextSibling {
-		if GetElementWithClass(c, tagname, class) != nil {
-			return c
+		element := GetElementWithClass(c, tagname, class)
+		if element != nil {
+			return element
 		}
 	}
 	return nil
+}
+
+func PrintNode(node *html.Node) {
+	fmt.Print("Node Type: ")
+	switch node.Type {
+	case html.ElementNode:
+		fmt.Println("Element")
+	case html.TextNode:
+		fmt.Println("Text")
+	default:
+		fmt.Println("Other")
+	}
+
+	fmt.Println("Node Data:", node.Data)
+
+	fmt.Println("Node Attributes")
+	for _, a := range node.Attr {
+		fmt.Println(a.Key, a.Val)
+	}
 }
