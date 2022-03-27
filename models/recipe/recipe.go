@@ -1,7 +1,7 @@
 package recipe
 
 import (
-	"errors"
+	"parser"
 
 	"golang.org/x/net/html"
 )
@@ -21,38 +21,101 @@ type Recipe struct {
 }
 
 // Just return nil if it can't find the item?
-func FromHTML(doc *html.Node) (*Recipe, error) {
-	ingredientList, err := findIngredientList(doc)
+// For best performance, let node point to the recipe card
+func FromHTML(node *html.Node) (*Recipe, error) {
+	ingredientList, err := parser.FindIngredientList(node)
 	if err != nil {
 		return nil, err
 	}
 
-	instructionsList, err := findInstructionsList(doc)
+	instructionsList, err := parser.FindInstructionsList(node)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Recipe{
-		getName(doc),
-		getImage(doc),
+		getName(node),
+		getImage(node),
 		getIngredients(ingredientList),
 		getInstructions(instructionsList),
 	}, nil
 }
 
-
-func getName(doc *html.Node) string {
-
+// Probably replace nil checks with panics because they shouldn't realistically happen
+func getName(node *html.Node) string {
+	headerNode := parser.GetElementWithClass(node, "h2", "wprm-recipe-name wprm-block-text-bold")
+	if headerNode == nil {
+		return "Error: headerNode not found"
+	}
+	textNode := headerNode.FirstChild
+	if textNode == nil {
+		return "Error: textNode not found"
+	}
+	return textNode.Data
 }
 
-func getImage(doc *html.Node) string {
-
+func getImage(node *html.Node) string {
+	imgNode := parser.GetElementWithClass(node, "img", "attachment-200x200 size-200x200 lazy-loaded")
+	if imgNode == nil {
+		return "Error: imgNode not found"
+	}
+	for _, a := range imgNode.Attr {
+		if a.Key == "data-pin-media" {
+			return a.Val
+		}
+	}
+	// Maybe just return empty string for this
+	return "Error: could not find image link"
 }
 
+// Assumes ingredient list is passed
 func getIngredients(list *html.Node) []Ingredient {
-
+	classes := []string{
+		"wprm-recipe-ingredient-amount",
+		"wprm-recipe-ingredient-unit",
+		"wprm-recipe-ingredient-name",
+		"wprm-recipe-ingredient-notes wprm-recipe-ingredient-notes-normal",
+	}
+	ingredients := []Ingredient{}
+	for li := list.FirstChild; li != nil; li = li.NextSibling {
+		ingredient := Ingredient{}
+		for index, class := range classes {
+			spanNode := parser.GetElementWithClass(li, "span", class)
+			if spanNode == nil {
+				// panic
+			}
+			textNode := spanNode.FirstChild
+			switch index {
+			case 0:
+				ingredient.Amount = textNode.Data
+			case 1:
+				ingredient.Unit = textNode.Data
+			case 2:
+				ingredient.Name = textNode.Data
+			case 3:
+				ingredient.Notes = textNode.Data
+			}
+		}
+		ingredients = append(ingredients, ingredient)
+	}
+	return ingredients
 }
 
+// Assuming that the instructions list is parsed in order
 func getInstructions(list *html.Node) []string {
-
+	instructions := []string{}
+	for li := list.FirstChild; li != nil; li = li.NextSibling {
+		if li.Type == html.ElementNode && li.Data == "li" {
+			for _, a := range li.Attr {
+				if a.Key == "class" && a.Val == "wprm-recipe-instruction" {
+					textNode := li.FirstChild
+					if textNode == nil {
+						// panic
+					}
+					instructions = append(instructions, textNode.Data)
+				}
+			}
+		}
+	}
+	return instructions
 }
