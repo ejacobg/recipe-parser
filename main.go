@@ -35,4 +35,12 @@ func main() {
 		log.Fatalln("Error:", err)
 	}
 	parser.PrintIngredientList(list)
+
+	rc := parser.FindRecipeCard(doc)
+	if rc == nil {
+		log.Fatalln("Error: couldn't find recipe card")
+	}
+	for _, a := range rc.Attr {
+		fmt.Println(a.Key, a.Val)
+	}
 }
