@@ -81,7 +81,9 @@ func getName(node *html.Node) string {
 
 func getImage(node *html.Node) string {
 	// The class list in the Elements tab has a different order than what is actually written in the raw HTML
-	imgNode := parser.GetElementWithClass(node, "img", "lazy-hidden attachment-200x200 size-200x200")
+	// Code from the HTTP response (line 999) looks like this: lazy lazy-hidden attachment-200x200 size-200x200
+	// The rendered HTML uses this: lazy-hidden attachment-200x200 size-200x200
+	imgNode := parser.GetElementWithClass(node, "img", "lazy lazy-hidden attachment-200x200 size-200x200")
 	if imgNode == nil {
 		return "Error: imgNode not found"
 	}

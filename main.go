@@ -17,8 +17,8 @@ func main() {
 		log.Fatalln("Error: too few arguments")
 	}
 
-	baseURL := "http://localhost:8080/"
-	resp, err := http.Get(baseURL + os.Args[1] + ".html")
+	baseURL := "http://www.budgetbytes.com/"
+	resp, err := http.Get(baseURL + os.Args[1])
 	if err != nil {
 		log.Fatalln("Error:", err)
 	}
@@ -31,18 +31,9 @@ func main() {
 		log.Fatalln("Error:", err)
 	}
 
-	list, err := parser.FindIngredientList(doc)
-	if err != nil {
-		log.Fatalln("Error:", err)
-	}
-	parser.PrintIngredientList(list)
-
 	rc := parser.FindRecipeCard(doc)
 	if rc == nil {
 		log.Fatalln("Error: couldn't find recipe card")
-	}
-	for _, a := range rc.Attr {
-		fmt.Println(a.Key, a.Val)
 	}
 
 	r, err := recipe.FromHTML(rc)
