@@ -22,3 +22,4 @@ go.work
 
 # Server files (for testing)
 server/recipes
+requests
