@@ -41,10 +41,12 @@ func main() {
 		log.Fatalln("Error:", err)
 	}
 
-	json, err := r.ToJSON()
+	dbPath := "./database/"
+	err = r.SaveAs(dbPath + os.Args[1])
 	if err != nil {
 		log.Fatalln("Error:", err)
 	}
-	fmt.Println(json)
+
+	fmt.Println("Recipe saved to ./database/" + os.Args[1])
 
 }

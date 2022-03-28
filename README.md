@@ -7,22 +7,25 @@ Navigating to the "Print Recipe" link will bring you to a "minified" version of 
 Todo (unordered):
 
 -   [ ] Make gallery of all the recipe pics
--   [X] Gather all relevant info into data structure
+-   [x] Gather all relevant info into data structure
 -   [ ] Create API routes
 -   [ ] Create webpage
 -   [ ] Create DB of saved recipes
--   [ ] Create local/plaintext DB
+-   [x] Create local/plaintext DB
 -   [ ] Create queries/data visualizations (eg. show recipe vs ingredients)
     -   [ ] Add this to website
 -   [ ] Handle instructions that may have a nested list (find an example)
--   [X] Create and initialize recipe model
-    -   [X] Test initialization of the recipe model
+-   [x] Create and initialize recipe model
+    -   [x] Test initialization of the recipe model
 -   [ ] Create a "GetElement" or "GetElementByKeyValue" function
 
 ## Usage
 
 When testing, remember to run the server (`cd server` then `go run .`).  
 Only 1 recipe is active right now for the parser to use (`go run . slow-cooker-mashed-potatoes` in root).
+Note: Right now the parser **has to be run in root** in order to access the `database` directory.
+
+Some example recipes are included in the database for reference.
 
 ## Acknowledgements
 
