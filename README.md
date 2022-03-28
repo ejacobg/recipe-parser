@@ -7,7 +7,7 @@ Navigating to the "Print Recipe" link will bring you to a "minified" version of 
 Todo (unordered):
 
 -   [ ] Make gallery of all the recipe pics
--   [ ] Gather all relevant info into data structure
+-   [X] Gather all relevant info into data structure
 -   [ ] Create API routes
 -   [ ] Create webpage
 -   [ ] Create DB of saved recipes
@@ -15,8 +15,8 @@ Todo (unordered):
 -   [ ] Create queries/data visualizations (eg. show recipe vs ingredients)
     -   [ ] Add this to website
 -   [ ] Handle instructions that may have a nested list (find an example)
--   [ ] Create and initialize recipe model
-    -   [ ] Test initialization of the recipe model
+-   [X] Create and initialize recipe model
+    -   [X] Test initialization of the recipe model
 -   [ ] Create a "GetElement" or "GetElementByKeyValue" function
 
 ## Usage
