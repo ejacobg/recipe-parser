@@ -2,6 +2,7 @@ package recipe
 
 import (
 	"encoding/json"
+	"os"
 	"parser"
 
 	"golang.org/x/net/html"
@@ -20,6 +21,18 @@ type Recipe struct {
 	Image        string       `json:"image"`
 	Ingredients  []Ingredient `json:"ingredients"`
 	Instructions []string     `json:"instructions"`
+}
+
+func (r *Recipe) SaveAs(path string) error {
+	data, err := json.MarshalIndent(r, "", "  ")
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(path+".json", data, 00666)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *Recipe) ToJSON() (string, error) {
@@ -110,7 +123,8 @@ func getIngredients(list *html.Node) []Ingredient {
 		for index, class := range classes {
 			spanNode := parser.GetElementWithClass(li, "span", class)
 			if spanNode == nil {
-				// panic
+				// not all ingredients define all 4 classes
+				continue
 			}
 			textNode := spanNode.FirstChild
 			switch index {
