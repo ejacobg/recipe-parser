@@ -4,6 +4,8 @@ Scrapes recipes from budgetbyes.com and returns them as HTML or JSON. Includes o
 
 Navigating to the "Print Recipe" link will bring you to a "minified" version of the recipe. This link contains the ID of the recipe, which might also be useful. The recipe ID is also found within the container div.
 
+The "Print Recipe" page can be seen by going to `budgetbytes.com/wprm_print/<recipe_id>`
+
 Todo (unordered):
 
 -   [ ] Make gallery of all the recipe pics
@@ -18,6 +20,10 @@ Todo (unordered):
 -   [x] Create and initialize recipe model
     -   [x] Test initialization of the recipe model
 -   [ ] Create a "GetElement" or "GetElementByKeyValue" function
+-   [ ] Fix multiple ingredients issue (chili-roasted-potatoes is broken, but not others)
+-   [ ] Create "GetElement**s**" functions that return a collection rather than just the first one
+-   [ ] Include the recipe link in the recipe model for convenience
+-   [ ] Allow batch processing from file
 
 ## Usage
 
