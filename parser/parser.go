@@ -94,6 +94,20 @@ func GetElementWithClass(node *html.Node, tagname, class string) *html.Node {
 	return nil
 }
 
+// Returns the first text node under the given node
+func GetTextNode(node *html.Node) *html.Node {
+	if node.Type == html.TextNode {
+		return node
+	}
+	for c := node.FirstChild; c != nil; c = c.NextSibling {
+		textNode := GetTextNode(c)
+		if textNode != nil {
+			return textNode
+		}
+	}
+	return nil
+}
+
 func PrintNode(node *html.Node) {
 	fmt.Print("Node Type: ")
 	switch node.Type {

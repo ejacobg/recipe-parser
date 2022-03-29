@@ -126,7 +126,8 @@ func getIngredients(list *html.Node) []Ingredient {
 				// not all ingredients define all 4 classes
 				continue
 			}
-			textNode := spanNode.FirstChild
+			// Sometimes ingredients may be contained within links
+			textNode := parser.GetTextNode(spanNode)
 			switch index {
 			case 0:
 				ingredient.Amount = textNode.Data
@@ -150,9 +151,7 @@ func getInstructions(list *html.Node) []string {
 		if li.Type == html.ElementNode && li.Data == "li" {
 			for _, a := range li.Attr {
 				if a.Key == "class" && a.Val == "wprm-recipe-instruction" {
-					// Cheating here
-					// Create a "GetElement" or "GetElementByKeyValue" function
-					textNode := li.FirstChild.FirstChild.FirstChild
+					textNode := parser.GetTextNode(li)
 					if textNode == nil {
 						// panic
 					}
