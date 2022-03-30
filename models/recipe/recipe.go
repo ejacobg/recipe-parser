@@ -2,6 +2,7 @@ package recipe
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"parser"
 
@@ -46,9 +47,9 @@ func (r *Recipe) ToJSON() (string, error) {
 // Just return nil if it can't find the item?
 // For best performance, let node point to the recipe card
 func FromHTML(node *html.Node) (*Recipe, error) {
-	ingredientList, err := parser.FindIngredientList(node)
-	if err != nil {
-		return nil, err
+	ingredientLists := parser.FindIngredientLists(node)
+	if ingredientLists == nil {
+		return nil, errors.New("couldn't find ingredients list(s)")
 	}
 
 	instructionsList, err := parser.FindInstructionsList(node)
@@ -60,7 +61,7 @@ func FromHTML(node *html.Node) (*Recipe, error) {
 		getID(node),
 		getName(node),
 		getImage(node),
-		getIngredients(ingredientList),
+		IngredientsFromLists(ingredientLists),
 		getInstructions(instructionsList),
 	}, nil
 }
@@ -142,6 +143,14 @@ func getIngredients(list *html.Node) []Ingredient {
 		ingredients = append(ingredients, ingredient)
 	}
 	return ingredients
+}
+
+// Some recipes may have multiple ingredients lists
+func IngredientsFromLists(lists []*html.Node) (ingredients []Ingredient) {
+	for _, list := range lists {
+		ingredients = append(ingredients, getIngredients(list)...)
+	}
+	return
 }
 
 // Assuming that the instructions list is parsed in order

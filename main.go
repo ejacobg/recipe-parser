@@ -36,6 +36,11 @@ func main() {
 		log.Fatalln("Error: couldn't find recipe card")
 	}
 
+	// ils := parser.FindIngredientLists(rc)
+	// for _, il := range ils {
+	// 	parser.PrintNode(il)
+	// }
+
 	r, err := recipe.FromHTML(rc)
 	if err != nil {
 		log.Fatalln("Error:", err)
