@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 )
 
 // See https://pkg.go.dev/golang.org/x/net/html#example-Parse
@@ -106,6 +107,42 @@ func GetTextNode(node *html.Node) *html.Node {
 		}
 	}
 	return nil
+}
+
+// TraverseNode collecting the nodes that match the given function
+// See https://gist.github.com/Xeoncross/8bbb84bc4bf540bd907f79ee17c4e1fc
+func TraverseNode(doc *html.Node, matcher func(node *html.Node) (bool, bool)) (nodes []*html.Node) {
+	var keep, exit bool
+	var f func(*html.Node)
+	f = func(n *html.Node) {
+		keep, exit = matcher(n)
+		if keep {
+			nodes = append(nodes, n)
+		}
+		if exit {
+			return
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			f(c)
+		}
+	}
+	f(doc)
+	return nodes
+}
+
+func FindIngredientLists(node *html.Node) []*html.Node {
+	matcher := func(node *html.Node) (keep, exit bool) {
+		if node.Type == html.ElementNode && node.DataAtom == atom.Ul {
+			for _, a := range node.Attr {
+				if a.Key == "class" && a.Val == "wprm-recipe-ingredients" {
+					keep = true
+					exit = true // No nested ingredients lists
+				}
+			}
+		}
+		return
+	}
+	return TraverseNode(node, matcher)
 }
 
 func PrintNode(node *html.Node) {
