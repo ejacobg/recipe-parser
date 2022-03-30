@@ -24,6 +24,10 @@ Todo (unordered):
 -   [ ] Create "GetElement**s**" functions that return a collection rather than just the first one
 -   [ ] Include the recipe link in the recipe model for convenience
 -   [ ] Allow batch processing from file
+-   [ ] Use `atom.Atom` to check for tag names instead of strings
+-   [ ] Refactor parser to use collecter/matcher pattern (https://gist.github.com/Xeoncross/8bbb84bc4bf540bd907f79ee17c4e1fc)
+-   [ ] Use `html.Render` instead of your `PrintNode` function (also see link above)
+-   [ ] Write test suite for parser
 
 ## Usage
 
