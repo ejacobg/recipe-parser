@@ -10,6 +10,17 @@ import (
 // assert function
 
 // setup function
+func initTest(t testing.TB, name string) *html.Node {
+	t.Helper()
+	doc, err := parseFromFile(name)
+	if err != nil {
+		t.Error("Error parsing file:", err)
+		return nil
+	}
+	rc := FindRecipeCard(doc)
+	return rc
+}
+
 // read data from static file instead of making network calls
 func parseFromFile(filename string) (*html.Node, error) {
 	file, err := os.Open(filename)
@@ -29,7 +40,10 @@ func TestSimple(t *testing.T) {
 	}
 
 	for _, test := range tests {
-
+		rc := initTest(t, test)
+		if rc == nil {
+			t.Errorf("Error: couldn't find recipe card")
+		}
 		t.Run(test, func(t *testing.T) {
 
 		})
@@ -44,6 +58,10 @@ func TestIngredientContainsLink(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		rc := initTest(t, test)
+		if rc == nil {
+			t.Errorf("Error: couldn't find recipe card")
+		}
 
 		t.Run(test, func(t *testing.T) {
 
@@ -58,6 +76,10 @@ func TestMultipleIngredientLists(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		rc := initTest(t, test)
+		if rc == nil {
+			t.Errorf("Error: couldn't find recipe card")
+		}
 
 		t.Run(test, func(t *testing.T) {
 
