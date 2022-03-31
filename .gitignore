@@ -23,3 +23,9 @@ go.work
 # Server files (for testing)
 server/recipes
 requests
+
+# Test files
+parser/test-data
+
+# Only committing database examples (ignoring everything else)
+database/*
