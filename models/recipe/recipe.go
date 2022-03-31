@@ -1,52 +1,16 @@
 package recipe
 
 import (
-	"encoding/json"
 	"errors"
-	"os"
+	"models"
 	"parser"
 
 	"golang.org/x/net/html"
 )
 
-type Ingredient struct {
-	Amount string `json:"amount"`
-	Unit   string `json:"unit"`
-	Name   string `json:"name"`
-	Notes  string `json:"notes"`
-}
-
-type Recipe struct {
-	ID           string       `json:"id"`
-	Name         string       `json:"name"`
-	Image        string       `json:"image"`
-	Ingredients  []Ingredient `json:"ingredients"`
-	Instructions []string     `json:"instructions"`
-}
-
-func (r *Recipe) SaveAs(path string) error {
-	data, err := json.MarshalIndent(r, "", "  ")
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(path+".json", data, 00666)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *Recipe) ToJSON() (string, error) {
-	data, err := json.MarshalIndent(r, "", "  ")
-	if err != nil {
-		return "", err
-	}
-	return string(data), nil
-}
-
 // Just return nil if it can't find the item?
 // For best performance, let node point to the recipe card
-func FromHTML(node *html.Node) (*Recipe, error) {
+func FromHTML(node *html.Node) (*models.Recipe, error) {
 	ingredientLists := parser.FindIngredientLists(node)
 	if ingredientLists == nil {
 		return nil, errors.New("couldn't find ingredients list(s)")
@@ -57,12 +21,12 @@ func FromHTML(node *html.Node) (*Recipe, error) {
 		return nil, err
 	}
 
-	return &Recipe{
-		getID(node),
-		getName(node),
-		getImage(node),
-		IngredientsFromLists(ingredientLists),
-		getInstructions(instructionsList),
+	return &models.Recipe{
+		ID:           getID(node),
+		Name:         getName(node),
+		Image:        getImage(node),
+		Ingredients:  IngredientsFromLists(ingredientLists),
+		Instructions: getInstructions(instructionsList),
 	}, nil
 }
 
@@ -111,16 +75,16 @@ func getImage(node *html.Node) string {
 }
 
 // Assumes ingredient list is passed
-func getIngredients(list *html.Node) []Ingredient {
+func getIngredients(list *html.Node) []models.Ingredient {
 	classes := []string{
 		"wprm-recipe-ingredient-amount",
 		"wprm-recipe-ingredient-unit",
 		"wprm-recipe-ingredient-name",
 		"wprm-recipe-ingredient-notes wprm-recipe-ingredient-notes-normal",
 	}
-	ingredients := []Ingredient{}
+	ingredients := []models.Ingredient{}
 	for li := list.FirstChild; li != nil; li = li.NextSibling {
-		ingredient := Ingredient{}
+		ingredient := models.Ingredient{}
 		for index, class := range classes {
 			spanNode := parser.GetElementWithClass(li, "span", class)
 			if spanNode == nil {
@@ -146,7 +110,7 @@ func getIngredients(list *html.Node) []Ingredient {
 }
 
 // Some recipes may have multiple ingredients lists
-func IngredientsFromLists(lists []*html.Node) (ingredients []Ingredient) {
+func IngredientsFromLists(lists []*html.Node) (ingredients []models.Ingredient) {
 	for _, list := range lists {
 		ingredients = append(ingredients, getIngredients(list)...)
 	}
