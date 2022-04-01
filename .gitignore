@@ -29,3 +29,6 @@ recipe/test-data
 
 # Only committing database examples (ignoring everything else)
 database/*
+!database/fluffy-garlic-herb-mashed-potatoes.json
+!database/olive-oil-mashed-potatoes.json
+!database/slow-cooker-mashed-potatoes.json

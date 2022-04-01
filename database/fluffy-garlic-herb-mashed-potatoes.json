@@ -26,6 +26,48 @@
       "unit": "cup",
       "name": "whole milk",
       "notes": "($0.16)"
+    },
+    {
+      "amount": "1",
+      "unit": "tsp",
+      "name": "dried parsley",
+      "notes": "($0.10)"
+    },
+    {
+      "amount": "1/2",
+      "unit": "tsp",
+      "name": "dried oregano",
+      "notes": "($0.05)"
+    },
+    {
+      "amount": "1/2 ",
+      "unit": "tsp",
+      "name": "dried basil",
+      "notes": "($0.05)"
+    },
+    {
+      "amount": "1/4",
+      "unit": "tsp",
+      "name": "garlic powder",
+      "notes": "($0.02)"
+    },
+    {
+      "amount": "1/4",
+      "unit": "tsp",
+      "name": "onion powder",
+      "notes": "($0.02)"
+    },
+    {
+      "amount": "1/4",
+      "unit": "tsp",
+      "name": "salt",
+      "notes": "($0.02)"
+    },
+    {
+      "amount": "",
+      "unit": "",
+      "name": "freshly cracked pepper",
+      "notes": "($0.02)"
     }
   ],
   "instructions": [
