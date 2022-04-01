@@ -1,14 +1,22 @@
 package recipe
 
 import (
+	"models"
 	"os"
 	"parser"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"golang.org/x/net/html"
 )
 
 // assert function
+func assert(t testing.TB, got, want *models.Recipe) {
+	t.Helper()
+	if !cmp.Equal(got, want) {
+		t.Errorf("got %v, want %v", got, want)
+	}
+}
 
 // setup function
 func initTest(t testing.TB, name string) *html.Node {
@@ -37,16 +45,26 @@ func TestSimple(t *testing.T) {
 	tests := []string{
 		"slow-cooker-mashed-potatoes",
 		"olive-oil-mashed-potatoes",
-		"fluffy-garlic-herb-mashed-potatoes",
 	}
 
 	for _, test := range tests {
-		rc := initTest(t, test)
+		rc := initTest(t, "./test-data/responses/" + test + ".html")
 		if rc == nil {
-			t.Errorf("Error: couldn't find recipe card")
+			t.Error("Error: couldn't find recipe card")
+			return
 		}
 		t.Run(test, func(t *testing.T) {
-
+			got, err := FromHTML(rc)
+			if err != nil {
+				t.Error("Error:", err)
+				return
+			}
+			want, err := FromJSON("./test-data/solutions/" + test + ".json")
+			if err != nil {
+				t.Error("Error:", err)
+				return
+			}
+			assert(t, got, want)
 		})
 	}
 }
@@ -59,13 +77,23 @@ func TestIngredientContainsLink(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		rc := initTest(t, test)
+		rc := initTest(t, "./test-data/responses/" + test + ".html")
 		if rc == nil {
-			t.Errorf("Error: couldn't find recipe card")
+			t.Error("Error: couldn't find recipe card")
+			return
 		}
-
 		t.Run(test, func(t *testing.T) {
-
+			got, err := FromHTML(rc)
+			if err != nil {
+				t.Error("Error:", err)
+				return
+			}
+			want, err := FromJSON("./test-data/solutions/" + test + ".json")
+			if err != nil {
+				t.Error("Error:", err)
+				return
+			}
+			assert(t, got, want)
 		})
 	}
 }
@@ -74,16 +102,27 @@ func TestMultipleIngredientLists(t *testing.T) {
 	tests := []string{
 		"beef-cabbage-stir-fry",
 		"chili-roasted-potatoes",
+		"fluffy-garlic-herb-mashed-potatoes",
 	}
 
 	for _, test := range tests {
-		rc := initTest(t, test)
+		rc := initTest(t, "./test-data/responses/" + test + ".html")
 		if rc == nil {
-			t.Errorf("Error: couldn't find recipe card")
+			t.Error("Error: couldn't find recipe card")
+			return
 		}
-
 		t.Run(test, func(t *testing.T) {
-
+			got, err := FromHTML(rc)
+			if err != nil {
+				t.Error("Error:", err)
+				return
+			}
+			want, err := FromJSON("./test-data/solutions/" + test + ".json")
+			if err != nil {
+				t.Error("Error:", err)
+				return
+			}
+			assert(t, got, want)
 		})
 	}
 }
