@@ -25,7 +25,7 @@ server/recipes
 requests
 
 # Test files
-parser/test-data
+recipe/test-data
 
 # Only committing database examples (ignoring everything else)
 database/*

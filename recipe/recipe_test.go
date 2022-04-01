@@ -1,7 +1,8 @@
-package parser
+package recipe
 
 import (
 	"os"
+	"parser"
 	"testing"
 
 	"golang.org/x/net/html"
@@ -17,13 +18,13 @@ func initTest(t testing.TB, name string) *html.Node {
 		t.Error("Error parsing file:", err)
 		return nil
 	}
-	rc := FindRecipeCard(doc)
+	rc := parser.FindRecipeCard(doc)
 	return rc
 }
 
 // read data from static file instead of making network calls
-func parseFromFile(filename string) (*html.Node, error) {
-	file, err := os.Open(filename)
+func parseFromFile(name string) (*html.Node, error) {
+	file, err := os.Open(name)
 	if err != nil {
 		return nil, err
 	}
