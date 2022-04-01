@@ -1,8 +1,10 @@
 package recipe
 
 import (
+	"encoding/json"
 	"errors"
 	"models"
+	"os"
 	"parser"
 
 	"golang.org/x/net/html"
@@ -28,6 +30,20 @@ func FromHTML(node *html.Node) (*models.Recipe, error) {
 		Ingredients:  IngredientsFromLists(ingredientLists),
 		Instructions: getInstructions(instructionsList),
 	}, nil
+}
+
+// Reads from a JSON file and returns a recipe
+func FromJSON(path string) (*models.Recipe, error) {
+	file, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	recipe := &models.Recipe{}
+	err = json.Unmarshal(file, &recipe)
+	if err != nil {
+		return nil, err
+	}
+	return recipe, nil
 }
 
 //

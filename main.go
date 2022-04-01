@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,12 +14,26 @@ import (
 
 func main() {
 	log.SetFlags(0)
-	if len(os.Args) < 2 {
+	readJSON := flag.Bool("json", false, "constructs a Recipe from a JSON file, then prints it")
+	flag.Parse()
+	
+	args := flag.Args()
+	
+	if len(args) < 1 {
 		log.Fatalln("Error: too few arguments")
 	}
 
+	if *readJSON {
+		r, err := recipe.FromJSON(args[0])
+		if err != nil {
+			log.Fatalln("Error:", err)
+		}
+		fmt.Println(r)
+		os.Exit(0)
+	} 
+
 	baseURL := "http://www.budgetbytes.com/"
-	resp, err := http.Get(baseURL + os.Args[1])
+	resp, err := http.Get(baseURL + args[0])
 	if err != nil {
 		log.Fatalln("Error:", err)
 	}
@@ -52,6 +67,6 @@ func main() {
 		log.Fatalln("Error:", err)
 	}
 
-	fmt.Println("Recipe saved to ./database/" + os.Args[1])
+	fmt.Println("Recipe saved to ./database/" + args[0])
 
 }
