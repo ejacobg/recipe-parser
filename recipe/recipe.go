@@ -3,9 +3,10 @@ package recipe
 import (
 	"encoding/json"
 	"errors"
-	"models"
 	"os"
-	"parser"
+
+	"github.com/ejacobg/recipe-parser/models"
+	"github.com/ejacobg/recipe-parser/parser"
 
 	"golang.org/x/net/html"
 )
@@ -46,7 +47,6 @@ func FromJSON(path string) (*models.Recipe, error) {
 	return recipe, nil
 }
 
-//
 func getID(node *html.Node) string {
 	rc := parser.FindRecipeCard(node)
 	if rc == nil {
@@ -77,7 +77,9 @@ func getImage(node *html.Node) string {
 	// The class list in the Elements tab has a different order than what is actually written in the raw HTML
 	// Code from the HTTP response (line 999) looks like this: lazy lazy-hidden attachment-200x200 size-200x200
 	// The rendered HTML uses this: lazy-hidden attachment-200x200 size-200x200
-	imgNode := parser.GetElementWithClass(node, "img", "lazy lazy-hidden attachment-200x200 size-200x200")
+	imgNode := parser.GetElementWithClass(
+		node, "img", "lazy lazy-hidden attachment-200x200 size-200x200",
+	)
 	if imgNode == nil {
 		return "Error: imgNode not found"
 	}

@@ -32,3 +32,6 @@ database/*
 !database/fluffy-garlic-herb-mashed-potatoes.json
 !database/olive-oil-mashed-potatoes.json
 !database/slow-cooker-mashed-potatoes.json
+
+# GoLand
+.idea

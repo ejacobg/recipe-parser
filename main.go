@@ -6,8 +6,9 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"parser"
-	"recipe"
+
+	"github.com/ejacobg/recipe-parser/parser"
+	"github.com/ejacobg/recipe-parser/recipe"
 
 	"golang.org/x/net/html"
 )
@@ -16,9 +17,9 @@ func main() {
 	log.SetFlags(0)
 	readJSON := flag.Bool("json", false, "constructs a Recipe from a JSON file, then prints it")
 	flag.Parse()
-	
+
 	args := flag.Args()
-	
+
 	if len(args) < 1 {
 		log.Fatalln("Error: too few arguments")
 	}
@@ -30,7 +31,7 @@ func main() {
 		}
 		fmt.Println(r)
 		os.Exit(0)
-	} 
+	}
 
 	baseURL := "http://www.budgetbytes.com/"
 	resp, err := http.Get(baseURL + args[0])
