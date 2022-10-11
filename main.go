@@ -13,11 +13,22 @@ import (
 	"golang.org/x/net/html"
 )
 
+func init() {
+	flag.Usage = func() {
+		w := flag.CommandLine.Output()
+		fmt.Fprintln(w, "Usage of recipe-parser:")
+		fmt.Fprintln(w, "recipe-parser <recipe-name>")
+		fmt.Fprintln(w, "recipe-parser -json <recipe-name>.json")
+		fmt.Fprintln(w, "Obtain the recipe name from the budgetbytes.com URL.")
+		flag.PrintDefaults()
+	}
+}
+
+var readJSON = flag.Bool("json", false, "constructs a Recipe from a JSON file, then prints it")
+
 func main() {
 	log.SetFlags(0)
-	readJSON := flag.Bool("json", false, "constructs a Recipe from a JSON file, then prints it")
 	flag.Parse()
-
 	args := flag.Args()
 
 	if len(args) < 1 {
@@ -69,5 +80,4 @@ func main() {
 	}
 
 	fmt.Println("Recipe saved to ./database/" + args[0])
-
 }
