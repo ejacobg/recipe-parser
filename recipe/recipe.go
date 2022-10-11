@@ -7,6 +7,7 @@ import (
 
 	"github.com/ejacobg/recipe-parser/models"
 	"github.com/ejacobg/recipe-parser/parser"
+	"golang.org/x/net/html/atom"
 
 	"golang.org/x/net/html"
 )
@@ -28,7 +29,7 @@ func FromHTML(node *html.Node) (*models.Recipe, error) {
 		ID:           getID(node),
 		Name:         getName(node),
 		Image:        getImage(node),
-		Ingredients:  IngredientsFromLists(ingredientLists),
+		Ingredients:  ingredientsFromLists(ingredientLists),
 		Instructions: getInstructions(instructionsList),
 	}, nil
 }
@@ -62,7 +63,7 @@ func getID(node *html.Node) string {
 
 // Probably replace nil checks with panics because they shouldn't realistically happen
 func getName(node *html.Node) string {
-	headerNode := parser.GetElementWithClass(node, "h2", "wprm-recipe-name wprm-block-text-bold")
+	headerNode := parser.GetElementWithClass(node, atom.H2, "wprm-recipe-name wprm-block-text-bold")
 	if headerNode == nil {
 		return "Error: headerNode not found"
 	}
@@ -78,7 +79,7 @@ func getImage(node *html.Node) string {
 	// Code from the HTTP response (line 999) looks like this: lazy lazy-hidden attachment-200x200 size-200x200
 	// The rendered HTML uses this: lazy-hidden attachment-200x200 size-200x200
 	imgNode := parser.GetElementWithClass(
-		node, "img", "lazy lazy-hidden attachment-200x200 size-200x200",
+		node, atom.Img, "attachment-268x268 size-268x268 perfmatters-lazy",
 	)
 	if imgNode == nil {
 		return "Error: imgNode not found"
@@ -90,6 +91,33 @@ func getImage(node *html.Node) string {
 	}
 	// Maybe just return empty string for this
 	return "Error: could not find image link"
+}
+
+// Some recipes may have multiple ingredients lists
+func ingredientsFromLists(lists []*html.Node) (ingredients []models.Ingredient) {
+	for _, list := range lists {
+		ingredients = append(ingredients, getIngredients(list)...)
+	}
+	return
+}
+
+// Assuming that the instructions list is parsed in order
+func getInstructions(list *html.Node) []string {
+	instructions := []string{}
+	for li := list.FirstChild; li != nil; li = li.NextSibling {
+		if li.Type == html.ElementNode && li.DataAtom == atom.Li {
+			for _, a := range li.Attr {
+				if a.Key == "class" && a.Val == "wprm-recipe-instruction" {
+					textNode := parser.GetTextNode(li)
+					if textNode == nil {
+						// panic
+					}
+					instructions = append(instructions, textNode.Data)
+				}
+			}
+		}
+	}
+	return instructions
 }
 
 // Assumes ingredient list is passed
@@ -104,7 +132,7 @@ func getIngredients(list *html.Node) []models.Ingredient {
 	for li := list.FirstChild; li != nil; li = li.NextSibling {
 		ingredient := models.Ingredient{}
 		for index, class := range classes {
-			spanNode := parser.GetElementWithClass(li, "span", class)
+			spanNode := parser.GetElementWithClass(li, atom.Span, class)
 			if spanNode == nil {
 				// not all ingredients define all 4 classes
 				continue
@@ -125,31 +153,4 @@ func getIngredients(list *html.Node) []models.Ingredient {
 		ingredients = append(ingredients, ingredient)
 	}
 	return ingredients
-}
-
-// Some recipes may have multiple ingredients lists
-func IngredientsFromLists(lists []*html.Node) (ingredients []models.Ingredient) {
-	for _, list := range lists {
-		ingredients = append(ingredients, getIngredients(list)...)
-	}
-	return
-}
-
-// Assuming that the instructions list is parsed in order
-func getInstructions(list *html.Node) []string {
-	instructions := []string{}
-	for li := list.FirstChild; li != nil; li = li.NextSibling {
-		if li.Type == html.ElementNode && li.Data == "li" {
-			for _, a := range li.Attr {
-				if a.Key == "class" && a.Val == "wprm-recipe-instruction" {
-					textNode := parser.GetTextNode(li)
-					if textNode == nil {
-						// panic
-					}
-					instructions = append(instructions, textNode.Data)
-				}
-			}
-		}
-	}
-	return instructions
 }
