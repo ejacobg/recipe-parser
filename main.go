@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ejacobg/recipe-parser/parser"
 	"github.com/ejacobg/recipe-parser/recipe"
 
 	"golang.org/x/net/html"
@@ -24,7 +23,10 @@ func init() {
 	}
 }
 
-var readJSON = flag.Bool("json", false, "constructs a Recipe from a JSON file, then prints it")
+var (
+	readJSON = flag.Bool("json", false, "constructs a Recipe from a JSON file, then prints it")
+	dbPath   = flag.String("dbpath", "./database/", "path to save JSON output")
+)
 
 func main() {
 	log.SetFlags(0)
@@ -58,26 +60,15 @@ func main() {
 		log.Fatalln("Error:", err)
 	}
 
-	rc := parser.FindRecipeCard(doc)
-	if rc == nil {
-		log.Fatalln("Error: couldn't find recipe card")
-	}
-
-	// ils := parser.FindIngredientLists(rc)
-	// for _, il := range ils {
-	// 	parser.PrintNode(il)
-	// }
-
-	r, err := recipe.FromHTML(rc)
+	r, err := recipe.FromHTML(doc)
 	if err != nil {
 		log.Fatalln("Error:", err)
 	}
 
-	dbPath := "./database/"
-	err = r.SaveAs(dbPath + os.Args[1])
+	err = r.SaveAs(*dbPath + os.Args[1])
 	if err != nil {
 		log.Fatalln("Error:", err)
 	}
 
-	fmt.Println("Recipe saved to ./database/" + args[0])
+	fmt.Println("Recipe saved to " + *dbPath + args[0])
 }

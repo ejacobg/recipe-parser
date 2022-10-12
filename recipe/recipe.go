@@ -12,29 +12,33 @@ import (
 	"golang.org/x/net/html"
 )
 
-// Just return nil if it can't find the item?
-// For best performance, let node point to the recipe card
-func FromHTML(node *html.Node) (*models.Recipe, error) {
-	ingredientLists := parser.FindIngredientLists(node)
+// FromHTML takes a document and attempts to build a recipe from it.
+func FromHTML(doc *html.Node) (*models.Recipe, error) {
+	recipeCard := parser.FindRecipeCard(doc)
+	if recipeCard == nil {
+		return nil, errors.New("couldn't find recipe card")
+	}
+
+	ingredientLists := parser.FindIngredientLists(recipeCard)
 	if ingredientLists == nil {
 		return nil, errors.New("couldn't find ingredients list(s)")
 	}
 
-	instructionsList, err := parser.FindInstructionsList(node)
-	if err != nil {
-		return nil, err
+	instructionsList := parser.FindInstructionsList(recipeCard)
+	if instructionsList == nil {
+		return nil, errors.New("instructions list does not exist")
 	}
 
 	return &models.Recipe{
-		ID:           getID(node),
-		Name:         getName(node),
-		Image:        getImage(node),
+		ID:           getID(recipeCard),
+		Name:         getName(recipeCard),
+		Image:        getImage(recipeCard),
 		Ingredients:  ingredientsFromLists(ingredientLists),
 		Instructions: getInstructions(instructionsList),
 	}, nil
 }
 
-// Reads from a JSON file and returns a recipe
+// FromJSON reads from a JSON file and returns a recipe.
 func FromJSON(path string) (*models.Recipe, error) {
 	file, err := os.ReadFile(path)
 	if err != nil {
@@ -48,11 +52,7 @@ func FromJSON(path string) (*models.Recipe, error) {
 	return recipe, nil
 }
 
-func getID(node *html.Node) string {
-	rc := parser.FindRecipeCard(node)
-	if rc == nil {
-		// panic or return empty string
-	}
+func getID(rc *html.Node) string {
 	for _, a := range rc.Attr {
 		if a.Key == "data-recipe-id" {
 			return a.Val
@@ -62,8 +62,8 @@ func getID(node *html.Node) string {
 }
 
 // Probably replace nil checks with panics because they shouldn't realistically happen
-func getName(node *html.Node) string {
-	headerNode := parser.GetElementWithClass(node, atom.H2, "wprm-recipe-name wprm-block-text-bold")
+func getName(rc *html.Node) string {
+	headerNode := parser.GetElementWithClass(rc, atom.H2, "wprm-recipe-name wprm-block-text-bold")
 	if headerNode == nil {
 		return "Error: headerNode not found"
 	}
@@ -74,12 +74,12 @@ func getName(node *html.Node) string {
 	return textNode.Data
 }
 
-func getImage(node *html.Node) string {
+func getImage(rc *html.Node) string {
 	// The class list in the Elements tab has a different order than what is actually written in the raw HTML
 	// Code from the HTTP response (line 999) looks like this: lazy lazy-hidden attachment-200x200 size-200x200
 	// The rendered HTML uses this: lazy-hidden attachment-200x200 size-200x200
 	imgNode := parser.GetElementWithClass(
-		node, atom.Img, "attachment-268x268 size-268x268 perfmatters-lazy",
+		rc, atom.Img, "attachment-268x268 size-268x268 perfmatters-lazy",
 	)
 	if imgNode == nil {
 		return "Error: imgNode not found"
@@ -89,7 +89,6 @@ func getImage(node *html.Node) string {
 			return a.Val
 		}
 	}
-	// Maybe just return empty string for this
 	return "Error: could not find image link"
 }
 
@@ -103,7 +102,7 @@ func ingredientsFromLists(lists []*html.Node) (ingredients []models.Ingredient) 
 
 // Assuming that the instructions list is parsed in order
 func getInstructions(list *html.Node) []string {
-	instructions := []string{}
+	var instructions []string
 	for li := list.FirstChild; li != nil; li = li.NextSibling {
 		if li.Type == html.ElementNode && li.DataAtom == atom.Li {
 			for _, a := range li.Attr {
@@ -128,7 +127,7 @@ func getIngredients(list *html.Node) []models.Ingredient {
 		"wprm-recipe-ingredient-name",
 		"wprm-recipe-ingredient-notes wprm-recipe-ingredient-notes-normal",
 	}
-	ingredients := []models.Ingredient{}
+	var ingredients []models.Ingredient
 	for li := list.FirstChild; li != nil; li = li.NextSibling {
 		ingredient := models.Ingredient{}
 		for index, class := range classes {

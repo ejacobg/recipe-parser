@@ -6,34 +6,37 @@ Navigating to the "Print Recipe" link will bring you to a "minified" version of 
 
 The "Print Recipe" page can be seen by going to `budgetbytes.com/wprm_print/<recipe_id>`
 
-Todo (unordered):
+Good-to-have:
 
--   [ ] Make gallery of all the recipe pics
 -   [x] Gather all relevant info into data structure
 -   [ ] Create API routes
--   [ ] Create webpage
 -   [ ] Create DB of saved recipes
 -   [x] Create local/plaintext DB
+-   [x] Create and initialize recipe model
+    -   [x] Test initialization of the recipe model
+-   [x] Create a "GetElement" or "GetElementByKeyValue" function
+-   [x] Fix multiple ingredients issue (chili-roasted-potatoes is broken, but not others)
+-   [x] Use `atom.Atom` to check for tag names instead of strings
+-   [x] Refactor parser to use collector/matcher pattern (https://gist.github.
+    com/Xeoncross/8bbb84bc4bf540bd907f79ee17c4e1fc)
+-   [ ] Write test suite for parser
+
+Nice-to-have:
+
+-   [ ] Create webpage
+-   [ ] Make gallery of all the recipe pics
 -   [ ] Create queries/data visualizations (eg. show recipe vs ingredients)
     -   [ ] Add this to website
 -   [ ] Handle instructions that may have a nested list (find an example)
--   [x] Create and initialize recipe model
-    -   [x] Test initialization of the recipe model
--   [ ] Create a "GetElement" or "GetElementByKeyValue" function
--   [ ] Fix multiple ingredients issue (chili-roasted-potatoes is broken, but not others)
 -   [ ] Create "GetElement**s**" functions that return a collection rather than just the first one
 -   [ ] Include the recipe link in the recipe model for convenience
+-   [ ] Use `html.Render` instead of your `PrintNode` function
 -   [ ] Allow batch processing from file
--   [x] Use `atom.Atom` to check for tag names instead of strings
--   [ ] Refactor parser to use collecter/matcher pattern (https://gist.github.com/Xeoncross/8bbb84bc4bf540bd907f79ee17c4e1fc)
--   [ ] Use `html.Render` instead of your `PrintNode` function (also see link above)
--   [ ] Write test suite for parser
 
 ## Usage
 
 When testing, remember to run the server (`cd server` then `go run .`).  
 Only 1 recipe is active right now for the parser to use (`go run . slow-cooker-mashed-potatoes` in root).
-Note: Right now the parser **has to be run in root** in order to access the `database` directory.
 
 Some example recipes are included in the database for reference.
 
