@@ -2,7 +2,6 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
 
 	"golang.org/x/net/html"
@@ -14,17 +13,7 @@ import (
 // FindRecipeCard returns the node representing the enclosing <div> of the recipe.
 // All the relevant recipe information is rooted at this node.
 func FindRecipeCard(node *html.Node) *html.Node {
-	matcher := func(node *html.Node) bool {
-		if node.Type == html.ElementNode && node.DataAtom == atom.Div {
-			for _, a := range node.Attr {
-				if a.Key == "class" && a.Val == "wprm-recipe-container" {
-					return true
-				}
-			}
-		}
-		return false
-	}
-	return FindNode(node, matcher)
+	return GetElementWithClass(node, atom.Div, "wprm-recipe-container")
 }
 
 // FindIngredientLists returns all nodes representing a list of ingredients.
@@ -47,25 +36,12 @@ func FindIngredientLists(node *html.Node) []*html.Node {
 
 // FindInstructionsList returns the node representing the list of recipe instructions.
 // This implementation currently assumes that there is only 1 master list of instructions.
-func FindInstructionsList(node *html.Node) (*html.Node, error) {
-	matcher := func(node *html.Node) bool {
-		if node.Type == html.ElementNode && node.DataAtom == atom.Ul {
-			for _, a := range node.Attr {
-				if a.Key == "class" && a.Val == "wprm-recipe-instructions" {
-					return true
-				}
-			}
-		}
-		return false
-	}
-	if il := FindNode(node, matcher); il != nil {
-		return il, nil
-	}
-	return nil, errors.New("instructions list does not exist")
+func FindInstructionsList(node *html.Node) *html.Node {
+	return GetElementWithClass(node, atom.Ul, "wprm-recipe-instructions")
 }
 
 // GetElementWithClass returns the first element underneath and including `node` that has the given
-// class value (as given in the HTML).
+// class value (as given in the HTML). The classes must be in the same order as those given.
 func GetElementWithClass(node *html.Node, tagname atom.Atom, class string) *html.Node {
 	matcher := func(node *html.Node) bool {
 		if node.Type == html.ElementNode && node.DataAtom == tagname {
