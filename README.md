@@ -10,7 +10,7 @@ Good-to-have:
 
 -   [x] Gather all relevant info into data structure
 -   [ ] Create API routes
--   [ ] Create DB of saved recipes
+-   [x] Create DB of saved recipes
 -   [x] Create local/plaintext DB
 -   [x] Create and initialize recipe model
     -   [x] Test initialization of the recipe model
