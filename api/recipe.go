@@ -3,10 +3,10 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/url"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/ejacobg/recipe-parser/models"
@@ -65,6 +65,7 @@ func getRecipe(w http.ResponseWriter, r *http.Request) error {
 		source string
 		rcp    *models.Recipe
 	)
+	rcp = &models.Recipe{}
 	query := r.URL.Query()
 	if names, ok := query["name"]; ok && len(names) > 0 {
 		source = canonicalize(names[0])
@@ -78,11 +79,7 @@ func getRecipe(w http.ResponseWriter, r *http.Request) error {
 		if err != nil {
 			return err
 		}
-		err = writeRecipe(w, rcp, http.StatusOK)
-		if err != nil {
-			return err
-		}
-		return nil
+		return writeRecipe(w, rcp, http.StatusOK)
 	}
 
 	filter := bson.D{{"url", source}}
@@ -93,11 +90,7 @@ func getRecipe(w http.ResponseWriter, r *http.Request) error {
 			return err
 		}
 	}
-	err = writeRecipe(w, rcp, http.StatusOK)
-	if err != nil {
-		return err
-	}
-	return nil
+	return writeRecipe(w, rcp, http.StatusOK)
 }
 
 // Adds a new record to the database, failing if that item already exists.
@@ -117,7 +110,7 @@ func postRecipe(w http.ResponseWriter, r *http.Request) error {
 
 	filter := bson.D{{"url", source}}
 	result := coll.FindOne(context.TODO(), filter)
-	if result.Err() != nil {
+	if result.Err() == nil {
 		http.Error(w, "recipe already exists", http.StatusBadRequest)
 		return nil
 	}
@@ -134,25 +127,19 @@ func postRecipe(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	err = writeRecipe(w, rcp, http.StatusCreated)
-	if err != nil {
-		return err
-	}
-	return nil
+	return writeRecipe(w, rcp, http.StatusOK)
 }
 
 // Updates an existing record in the database. WILL NOT create a new record, use POST.
 func putRecipe(w http.ResponseWriter, r *http.Request) (err error) {
 	var (
-		id  int
+		id  string
 		rcp *models.Recipe
 	)
+	rcp = &models.Recipe{}
 	query := r.URL.Query()
 	if ids, ok := query["id"]; ok && len(ids) > 0 {
-		id, err = strconv.Atoi(ids[0])
-		if err != nil {
-			return err
-		}
+		id = ids[0]
 	} else {
 		http.Error(w, "Error: no id given", http.StatusBadRequest)
 		return nil
@@ -162,6 +149,7 @@ func putRecipe(w http.ResponseWriter, r *http.Request) (err error) {
 	err = coll.FindOne(context.TODO(), filter).Decode(rcp)
 	if err != nil {
 		http.Error(w, "id does not exist", http.StatusNotFound)
+		return nil
 	}
 
 	rcp, err = recipeFromSource(rcp.URL)
@@ -169,25 +157,18 @@ func putRecipe(w http.ResponseWriter, r *http.Request) (err error) {
 		return err
 	}
 
-	_, err = coll.UpdateOne(context.TODO(), filter, rcp)
+	_, err = coll.ReplaceOne(context.TODO(), filter, rcp)
 	if err != nil {
 		return err
 	}
-	err = writeRecipe(w, rcp, http.StatusOK)
-	if err != nil {
-		return err
-	}
-	return nil
+	return writeRecipe(w, rcp, http.StatusOK)
 }
 
 func deleteRecipe(w http.ResponseWriter, r *http.Request) (err error) {
-	var id int
+	var id string
 	query := r.URL.Query()
 	if ids, ok := query["id"]; ok && len(ids) > 0 {
-		id, err = strconv.Atoi(ids[0])
-		if err != nil {
-			return err
-		}
+		id = ids[0]
 	} else {
 		http.Error(w, "Error: no id given", http.StatusBadRequest)
 		return nil
@@ -223,6 +204,9 @@ func recipeFromSource(source string) (*models.Recipe, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New("non-OK HTTP status from budgetbytes.com: " + resp.Status)
+	}
 	doc, err := html.Parse(resp.Body)
 	if err != nil {
 		return nil, err

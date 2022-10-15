@@ -87,7 +87,7 @@ func getURL(doc *html.Node) string {
 		return false
 	}
 	node := parser.FindNode(doc, matcher)
-	if node != nil {
+	if node == nil {
 		return ""
 	}
 	for _, a := range node.Attr {
