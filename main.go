@@ -89,6 +89,7 @@ func mongodb() {
 	uri := os.Getenv("MONGODB_URI")
 	if uri == "" {
 		log.Println("MONGODB_URI variable must be set")
+		return
 	}
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 	if err != nil {
