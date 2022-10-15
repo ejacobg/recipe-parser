@@ -32,6 +32,7 @@ func FromHTML(doc *html.Node) (*models.Recipe, error) {
 	return &models.Recipe{
 		ID:           getID(recipeCard),
 		Name:         getName(recipeCard),
+		URL:          getURL(doc),
 		Image:        getImage(recipeCard),
 		Ingredients:  ingredientsFromLists(ingredientLists),
 		Instructions: getInstructions(instructionsList),
@@ -72,6 +73,29 @@ func getName(rc *html.Node) string {
 		return "Error: textNode not found"
 	}
 	return textNode.Data
+}
+
+func getURL(doc *html.Node) string {
+	matcher := func(node *html.Node) bool {
+		if node.Type == html.ElementNode && node.DataAtom == atom.Link {
+			for _, a := range node.Attr {
+				if a.Key == "rel" && a.Val == "canonical" {
+					return true
+				}
+			}
+		}
+		return false
+	}
+	node := parser.FindNode(doc, matcher)
+	if node != nil {
+		return ""
+	}
+	for _, a := range node.Attr {
+		if a.Key == "href" {
+			return a.Val
+		}
+	}
+	return ""
 }
 
 func getImage(rc *html.Node) string {
