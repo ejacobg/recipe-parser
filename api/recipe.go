@@ -2,24 +2,19 @@ package api
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"net/http"
-	"net/url"
 	"os"
-	"strings"
 
+	"github.com/ejacobg/recipe-parser/api/utils"
 	"github.com/ejacobg/recipe-parser/models"
-	"github.com/ejacobg/recipe-parser/recipe"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"golang.org/x/net/html"
 )
 
 var coll *mongo.Collection
 
-func Handler(w http.ResponseWriter, r *http.Request) {
+func Recipe(w http.ResponseWriter, r *http.Request) {
 	// Connect to MongoDB
 	uri := os.Getenv("MONGODB_URI")
 	client, err := mongo.Connect(
@@ -63,34 +58,33 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 func getRecipe(w http.ResponseWriter, r *http.Request) error {
 	var (
 		source string
-		rcp    *models.Recipe
+		rcp    = &models.Recipe{}
 	)
-	rcp = &models.Recipe{}
 	query := r.URL.Query()
 	if names, ok := query["name"]; ok && len(names) > 0 {
-		source = canonicalize(names[0])
+		source = utils.Canonicalize(names[0])
 	} else {
 		http.Error(w, "Error: no name given", http.StatusNotFound)
 		return nil
 	}
 
 	if _, src := query["src"]; src {
-		rcp, err := recipeFromSource(source)
+		rcp, err := utils.RecipeFromSource(source)
 		if err != nil {
 			return err
 		}
-		return writeRecipe(w, rcp, http.StatusOK)
+		return utils.WriteRecipe(w, rcp, http.StatusOK)
 	}
 
 	filter := bson.D{{"url", source}}
 	err := coll.FindOne(context.TODO(), filter).Decode(rcp)
 	if err == mongo.ErrNoDocuments {
-		rcp, err = recipeFromSource(source)
+		rcp, err = utils.RecipeFromSource(source)
 		if err != nil {
 			return err
 		}
 	}
-	return writeRecipe(w, rcp, http.StatusOK)
+	return utils.WriteRecipe(w, rcp, http.StatusOK)
 }
 
 // Adds a new record to the database, failing if that item already exists.
@@ -102,7 +96,7 @@ func postRecipe(w http.ResponseWriter, r *http.Request) error {
 	)
 	query := r.URL.Query()
 	if names, ok := query["name"]; ok && len(names) > 0 {
-		source = canonicalize(names[0])
+		source = utils.Canonicalize(names[0])
 	} else {
 		http.Error(w, "Error: no name given", http.StatusBadRequest)
 		return nil
@@ -115,7 +109,7 @@ func postRecipe(w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 
-	rcp, err := recipeFromSource(source)
+	rcp, err := utils.RecipeFromSource(source)
 	if err != nil {
 		return err
 	}
@@ -127,16 +121,15 @@ func postRecipe(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	return writeRecipe(w, rcp, http.StatusOK)
+	return utils.WriteRecipe(w, rcp, http.StatusOK)
 }
 
 // Updates an existing record in the database. WILL NOT create a new record, use POST.
 func putRecipe(w http.ResponseWriter, r *http.Request) (err error) {
 	var (
 		id  string
-		rcp *models.Recipe
+		rcp = &models.Recipe{}
 	)
-	rcp = &models.Recipe{}
 	query := r.URL.Query()
 	if ids, ok := query["id"]; ok && len(ids) > 0 {
 		id = ids[0]
@@ -152,7 +145,7 @@ func putRecipe(w http.ResponseWriter, r *http.Request) (err error) {
 		return nil
 	}
 
-	rcp, err = recipeFromSource(rcp.URL)
+	rcp, err = utils.RecipeFromSource(rcp.URL)
 	if err != nil {
 		return err
 	}
@@ -161,7 +154,7 @@ func putRecipe(w http.ResponseWriter, r *http.Request) (err error) {
 	if err != nil {
 		return err
 	}
-	return writeRecipe(w, rcp, http.StatusOK)
+	return utils.WriteRecipe(w, rcp, http.StatusOK)
 }
 
 func deleteRecipe(w http.ResponseWriter, r *http.Request) (err error) {
@@ -177,51 +170,8 @@ func deleteRecipe(w http.ResponseWriter, r *http.Request) (err error) {
 	filter := bson.D{{"id", id}}
 	_, err = coll.DeleteOne(context.TODO(), filter)
 	if err != nil {
-		return err
+		return
 	}
 	w.WriteHeader(http.StatusOK)
-	return nil
-}
-
-// If the name is correct, then the canonicalized version should match the Recipe.URL field.
-func canonicalize(name string) string {
-	// Convert from "%2D" to "-"
-	esc, err := url.PathUnescape(name)
-	if err != nil {
-		// Ignore any failures
-		esc = name
-	}
-	esc = strings.TrimSpace(esc)
-	esc = strings.TrimSuffix(esc, "/")
-	return "https://www.budgetbytes.com/" + strings.ToLower(esc) + "/"
-}
-
-// "source" should be a canonicalized name.
-func recipeFromSource(source string) (*models.Recipe, error) {
-	resp, err := http.Get(source)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, errors.New("non-OK HTTP status from budgetbytes.com: " + resp.Status)
-	}
-	doc, err := html.Parse(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	return recipe.FromHTML(doc)
-}
-
-func writeRecipe(w http.ResponseWriter, rcp *models.Recipe, status int) error {
-	res, err := json.Marshal(*rcp)
-	if err != nil {
-		return err
-	}
-	w.WriteHeader(status)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(res)
 	return nil
 }
