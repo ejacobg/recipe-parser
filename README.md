@@ -9,7 +9,7 @@ The "Print Recipe" page can be seen by going to `budgetbytes.com/wprm_print/<rec
 Good-to-have:
 
 -   [x] Gather all relevant info into data structure
--   [ ] Create API routes
+-   [x] Create API routes
 -   [x] Create DB of saved recipes
 -   [x] Create local/plaintext DB
 -   [x] Create and initialize recipe model
