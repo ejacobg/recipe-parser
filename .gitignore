@@ -36,3 +36,5 @@ database/*
 # GoLand
 .idea
 .vercel
+
+.env
