@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ejacobg/recipe-parser/api/utils"
+	utils "github.com/ejacobg/recipe-parser/api-utils"
 	"github.com/ejacobg/recipe-parser/models"
 )
 

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ejacobg/recipe-parser/api/utils"
+	utils "github.com/ejacobg/recipe-parser/api-utils"
 	"github.com/ejacobg/recipe-parser/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
