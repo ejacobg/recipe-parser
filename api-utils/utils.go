@@ -49,8 +49,8 @@ func WriteRecipe(w http.ResponseWriter, rcp *models.Recipe, status int) error {
 	if err != nil {
 		return err
 	}
-	w.WriteHeader(status)
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
 	w.Write(res)
 	return nil
 }
