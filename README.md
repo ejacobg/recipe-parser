@@ -1,4 +1,5 @@
-Scrapes recipes from budgetbyes.com and returns them as JSON. Includes other features for saving and querying recipes. Written in Go.
+Scrapes recipes from budgetbytes.com and returns them as JSON. Includes other features for 
+saving and querying recipes. Written in Go.
 
 ## Usage
 
@@ -28,7 +29,17 @@ you to extract the recipe name from the URL:
 navigator.clipboard.writeText(document.location.pathname.split('/', 2)[1])
 ```
 
-Get the bookmarklet [here](javascript%3A%28%28%29%3D%3E%7Bnavigator.clipboard.writeText%28document.location.pathname.split%28%27%2F%27%2C%202%29%5B1%5D%29%7D%29%28%29).
+Get the bookmarklet <a href="javascript:(()=>{navigator.clipboard.writeText(document.location.pathname.split('/', 2)[1])})()">here</a>.
+
+With the name, you can make a GET or POST request to the service:
+
+```javascript
+fetch(`https://recipe-parser-ejacobg.vercel.app/api/{data|recipe}`, { method: "GET|POST" })
+    .then((response) => response.json())
+    .then((data) => {/* ... */})
+```
+
+You can update the code as you see fit.
 
 ### Example
 
@@ -50,7 +61,7 @@ All successful responses (except for DELETE) look similar to this:
     {
       "amount": "1.5",
       "unit": "cups",
-      "name": "chicken broth ",
+      "name": "chicken broth",
       "notes": "($0.20)"
     },
     {
@@ -68,19 +79,19 @@ All successful responses (except for DELETE) look similar to this:
     {
       "amount": "4",
       "unit": "oz.",
-      "name": "cream cheese ",
+      "name": "cream cheese",
       "notes": "($0.40)"
     },
     {
       "amount": "1/2",
       "unit": "cup",
-      "name": "milk ",
+      "name": "milk",
       "notes": "($0.25)"
     },
     {
       "amount": "1",
       "unit": "Tbsp",
-      "name": "butter ",
+      "name": "butter",
       "notes": "($0.13)"
     }
   ],
