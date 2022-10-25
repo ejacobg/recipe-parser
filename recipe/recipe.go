@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"strings"
 
 	"github.com/ejacobg/recipe-parser/models"
 	"github.com/ejacobg/recipe-parser/parser"
@@ -162,6 +163,7 @@ func getIngredients(list *html.Node) []models.Ingredient {
 			}
 			// Sometimes ingredients may be contained within links
 			textNode := parser.GetTextNode(spanNode)
+			textNode.Data = strings.TrimSpace(textNode.Data)
 			switch index {
 			case 0:
 				ingredient.Amount = textNode.Data
