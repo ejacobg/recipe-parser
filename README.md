@@ -25,11 +25,9 @@ query for this recipe: https://www.budgetbytes.com/slow-cooker-mashed-potatoes/,
 parameter would be `slow-cooker-mashed-potatoes`. For convenience, this bookmarklet will allow 
 you to extract the recipe name from the URL:
 
-```javascript
-navigator.clipboard.writeText(document.location.pathname.split('/', 2)[1])
 ```
-
-Get the bookmarklet <a href="javascript:(()=>{navigator.clipboard.writeText(document.location.pathname.split('/', 2)[1])})()">here</a>.
+javascript:(()=>{navigator.clipboard.writeText(document.location.pathname.split('/', 2)[1])})()
+```
 
 With the name, you can make a GET or POST request to the service:
 
